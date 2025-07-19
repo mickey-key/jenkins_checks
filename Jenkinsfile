@@ -33,7 +33,7 @@ pipeline {
         emailext(
           subject: "Jenkins pipeline '${env.JOB_NAME}' completed successfully",
             body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) completed successfully.",
-          to: 'happymommentsmickey@gmail.com' 
+          to: 'happymomentsmickey@gmail.com' 
         )
       }
     }
@@ -42,7 +42,7 @@ pipeline {
         emailext(
           subject: "Jenkins pipeline '${env.JOB_NAME}' failed",
             body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) failed. Log: ${env.BUILD_URL}",
-          to: 'happymommentsmickey@gmail.com' 
+          to: 'happymomentsmickey@gmail.com' 
         )
       }
     }
