@@ -6,13 +6,12 @@ node {
      
    
        stage('delpoy to kubernetes') { 
-         steps {
-             script {
+                    script {
               sh '''
               helm install my-hello-app ./helm 
               '''
               }
-       steps {
+
             container('helm') {
               script {
                 echo "Deploying to Kubernetes with Helm..."
@@ -21,8 +20,8 @@ node {
                     --namespace default                  '''
                 }
               } 
-         }}
-       }
+         }
+       
  
    post {
     success {
