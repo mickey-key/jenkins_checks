@@ -14,9 +14,7 @@ node {
               '''
               }
        }
- 
-   
-       stage('delpoy to kubernetes') { 
+     stage('delpoy to kubernetes') { 
                    
             container('helm') {
               script {
@@ -27,9 +25,8 @@ node {
                 }
               } 
          }
-       
- 
-   post {
+    }
+      post {
     success {
       script {
         echo "Pipeline completed successfully"
