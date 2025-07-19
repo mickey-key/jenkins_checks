@@ -25,7 +25,7 @@ pipeline {
         }
       }
     }  
-  }
+  
     stage('delete image') { 
        steps { 
          script{
@@ -35,7 +35,7 @@ pipeline {
          }
        }
      }     
- 
+  }
   post {
     success {
       script {
