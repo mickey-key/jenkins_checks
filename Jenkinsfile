@@ -1,53 +1,91 @@
-node {    
-      def app     
-     stage('Clone repository') {               
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          labels:
+            some-label: some-label-value
+        spec:
+          containers:
+          - name: docker
+            image: docker:24.0.5
+            command:
+            - cat
+            tty: true
+            volumeMounts:
+            - name: docker-socket
+              mountPath: /var/run/docker.sock
+          - name: sonarscanner
+            image: sonarsource/sonar-scanner-cli
+            command:
+            - cat
+            tty: true
+          volumes:
+          - name: docker-socket
+            hostPath:
+              path: /var/run/docker.sock
+      '''
+      retries 2
+    }
+  }
+
+  environment {
+    REPO_NAME = 'goals-app'
+    IMAGE_TAG = 'latest'
+    SONAR_PROJECT_KEY = "key"
+    SONAR_LOGIN = "login"
+    SONAR_HOST_URL = "http://127.0.0.1:9000"
+  }
+  stages {
+
+stage('Clone repository') {       
+  steps {
                   checkout scm    
-      }    
+      }}    
        
+        
+       stage('Run Tests') {
+      steps {
+        container('node') {
+          script {
+            echo "Running tests..."
+            sh '''
+              cd ./flask_app
+              python main.py
+            '''
+          }
+        }
+      }
+    }
 
 
-       stage('delpoy to kubernetes') { 
-                    script {
-              sh '''
-              snap install helm --classic
-              helm install my-hello-app ./helm 
-              '''
-              }
-       }
-     stage('delpoy to kubernetes') { 
-                   
+
+
+    stage('Deploy to Kubernetes with Helm') {
+        steps {
             container('helm') {
               script {
                 echo "Deploying to Kubernetes with Helm..."
                   sh '''
-                    helm upgrade -f ./helm/values.yaml \\
+                    helm install flask-app ./helm/ \\
                     --namespace default                  '''
                 }
-              } 
-   stage('Build image') { 
-          
-    app = docker.build("mickeykey/hello-flask-app:${env.BUILD_ID}","./flask_app")    
-       }           
-    stage('Test image') {                       
-        app.inside {            
-             sh 'echo "Tests passed"'        
-            }    
-        }            
-      stage('Push image') {
-     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-         app.push("${env.BUILD_NUMBER}")            
-         app.push("latest")        
-              }    
-           }
-      
+              }
+            }
+        }
     }
-      post {
+  
+
+  
+  post {
     success {
       script {
-        echo "Pipeline completed successfully"
+        echo "Pipeline completed successfully!"
         emailext(
-          subject: 'task 6 pipeline successful',
-            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) completed successfully",
+          subject: 'Jenkins Pipeline Success',
+            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) completed successfully.\n\nCheck results: ${env.BUILD_URL}",
           to: 'kara.nemesis@gmail.com' 
         )
       }
@@ -56,11 +94,11 @@ node {
       script {
         echo "Pipeline failed!"
         emailext(
-          subject: 'Pipeline failed',
+          subject: 'Jenkins Pipeline Failure',
             body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) failed.\n\nCheck the details here: ${env.BUILD_URL}",
           to: 'kara.nemesis@gmail.com' 
         )
       }
     }
-  }     
-        }
+  }
+}
