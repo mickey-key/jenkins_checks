@@ -46,9 +46,9 @@ stage('Clone repository') {
       }}    
        
     stage('Build image') { 
-  steps {
+  steps { script{
     app = docker.build("mickeykey/hello-flask-app:${env.BUILD_ID}","./flask_app")    
-       }      }     
+       }      }}     
     stage('Test image') {     
         steps {
         app.inside {            
