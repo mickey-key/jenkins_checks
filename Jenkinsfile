@@ -26,6 +26,7 @@ node {
               helm install my-hello-app ./helm 
               '''
               }
+       }
  
    
        stage('delpoy to kubernetes') { 
