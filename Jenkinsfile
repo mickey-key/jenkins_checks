@@ -96,7 +96,6 @@ stage('Clone repository') {
 
 
     stage('Deploy to Kubernetes with Helm') {
-        when { expression { params.SHOULD_PUSH_TO_ECR == true } }
         steps {
             container('helm') {
               script {
