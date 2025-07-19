@@ -1,104 +1,51 @@
 pipeline {
-  agent {
-    kubernetes {
-      yaml '''
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          labels:
-            some-label: some-label-value
-        spec:
-          containers:
-          - name: docker
-            image: docker:24.0.5
-            command:
-            - cat
-            tty: true
-            volumeMounts:
-            - name: docker-socket
-              mountPath: /var/run/docker.sock
-          - name: sonarscanner
-            image: sonarsource/sonar-scanner-cli
-            command:
-            - cat
-            tty: true
-          volumes:
-          - name: docker-socket
-            hostPath:
-              path: /var/run/docker.sock
-      '''
-      retries 2
-    }
-  }
-
-  environment {
-    REPO_NAME = 'goals-app'
-    IMAGE_TAG = 'latest'
-    SONAR_PROJECT_KEY = "key"
-    SONAR_LOGIN = "login"
-    SONAR_HOST_URL = "http://127.0.0.1:9000"
-  }
+  agent any
   stages {
-
-stage('Clone repository') {       
-  steps {
-                  checkout scm    
-      }}    
-       
-        
-       stage('Run Tests') {
+    stage('Clone repository') {       
       steps {
-        container('node') {
-          script {
-            echo "Running tests..."
-            sh '''
-              cd ./flask_app
-              python main.py
-            '''
+             checkout scm    
+      }
+    }    
+      
+     stage('Build image') { 
+       steps { 
+         script{
+           app = docker.build("mickeykey/hello-flask-app:${env.BUILD_ID}","./flask_app")    
+         }
+       }
+     }     
+ 
+    stage('Push image') {
+      steps {
+        script {
+          docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+          app.push("${env.BUILD_NUMBER}")            
+          app.push("latest")        
           }
         }
       }
-    }
-
-
-
-
-    stage('Deploy to Kubernetes with Helm') {
-        steps {
-            container('helm') {
-              script {
-                echo "Deploying to Kubernetes with Helm..."
-                  sh '''
-                    helm install flask-app ./helm/ \\
-                    --namespace default                  '''
-                }
-              }
-            }
-        }
-    }
-  
-
-  
+    }  
+  }
+ 
   post {
     success {
       script {
-        echo "Pipeline completed successfully!"
         emailext(
-          subject: 'Jenkins Pipeline Success',
-            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) completed successfully.\n\nCheck results: ${env.BUILD_URL}",
-          to: 'kara.nemesis@gmail.com' 
+          subject: 'Jenkins pipeline '${env.JOB_NAME}' completed successfully',
+            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) completed successfully.",
+          to: 'happymommentsmickey@gmail.com' 
         )
       }
     }
     failure {
       script {
-        echo "Pipeline failed!"
         emailext(
-          subject: 'Jenkins Pipeline Failure',
-            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) failed.\n\nCheck the details here: ${env.BUILD_URL}",
-          to: 'kara.nemesis@gmail.com' 
+          subject: 'Jenkins pipeline '${env.JOB_NAME}' failed',
+            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) failed. Log: ${env.BUILD_URL}",
+          to: 'happymommentsmickey@gmail.com' 
         )
       }
     }
   }
 }
+ 
