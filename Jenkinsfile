@@ -26,6 +26,15 @@ pipeline {
       }
     }  
   }
+    stage('delete image') { 
+       steps { 
+         script{
+           sh '''
+           docker rmi mickeykey/hello-flask-app:${env.BUILD_ID} 
+           '''
+         }
+       }
+     }     
  
   post {
     success {
