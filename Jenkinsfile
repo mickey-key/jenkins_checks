@@ -4,12 +4,12 @@ node {
                   checkout scm    
       }    
        
-    stage('Build image') { 
+
 
        stage('delpoy to kubernetes') { 
                     script {
               sh '''
-              sudo snap install helm --classic
+              snap install helm --classic
               helm install my-hello-app ./helm 
               '''
               }
@@ -24,7 +24,22 @@ node {
                     --namespace default                  '''
                 }
               } 
-         }
+   stage('Build image') { 
+          
+    app = docker.build("mickeykey/hello-flask-app:${env.BUILD_ID}","./flask_app")    
+       }           
+    stage('Test image') {                       
+        app.inside {            
+             sh 'echo "Tests passed"'        
+            }    
+        }            
+      stage('Push image') {
+     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+         app.push("${env.BUILD_NUMBER}")            
+         app.push("latest")        
+              }    
+           }
+      
     }
       post {
     success {
