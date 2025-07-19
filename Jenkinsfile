@@ -3,21 +3,9 @@ node {
      stage('Clone repository') {               
                   checkout scm    
       }    
-    stage ('test') {
-            script {
-            echo "Running tests..."
-            sh '''
-            docker --help
-            '''
-        }
-    }
-    
+     
     stage('Build image') { 
-         script {
-            sh '''
-            cd flask_app
-            '''
-         }
+
     app = docker.build("hello-flask-app:${env.BUILD_ID}","./flask_app")    
        }           
     stage('Test image') {                       
