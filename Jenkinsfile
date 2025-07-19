@@ -18,7 +18,7 @@ node {
             cd flask_app
             '''
          }
-    app = docker.build("mickeykey/hello-flask-app:${env.BUILD_ID}","./flask_app")    
+    app = docker.build("hello-flask-app:${env.BUILD_ID}","./flask_app")    
        }           
     stage('Test image') {                       
         app.inside {            
