@@ -51,16 +51,16 @@ stage('Clone repository') {
        }      }}     
     stage('Test image') {     
         steps {
-        app.inside {            
+        script{ app.inside {            
              sh 'echo "Tests passed"'        
-            }    }
+            }    }}
         }            
       stage('Push image') {
-          steps {
+          steps { script{
      docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
          app.push("${env.BUILD_NUMBER}")            
          app.push("latest")        
-              } }   
+              } }   }
            }
         
        stage('Run Tests') {
