@@ -1,0 +1,8 @@
+apiVersion: v2
+appVersion: 1.16.0
+name: hello-flask-app
+description: A Helm chart for deploying hello-flask-app
+version: 0.1.0
+maintainers:
+  - name: mickey
+    url: https://github.com/mickey-key

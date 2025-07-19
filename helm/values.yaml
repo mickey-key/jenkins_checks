@@ -1,0 +1,6 @@
+replicacount: 1
+image:
+  repository: mickeykey/hello-flask-app
+  tag: "latest"
+  pullPolicy: IfNotPresent
+serviceport: 8888
