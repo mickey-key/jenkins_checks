@@ -46,19 +46,21 @@ stage('Clone repository') {
       }}    
        
     stage('Build image') { 
-
+  steps {
     app = docker.build("mickeykey/hello-flask-app:${env.BUILD_ID}","./flask_app")    
-       }           
-    stage('Test image') {                       
+       }      }     
+    stage('Test image') {     
+        steps {
         app.inside {            
              sh 'echo "Tests passed"'        
-            }    
+            }    }
         }            
       stage('Push image') {
+          steps {
      docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
          app.push("${env.BUILD_NUMBER}")            
          app.push("latest")        
-              }    
+              } }   
            }
         
        stage('Run Tests') {
