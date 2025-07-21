@@ -9,14 +9,10 @@ metadata:
     app: jenkins-agent
     version: v1
 spec:
- 
-    
   - name: python
     image: python:3.13.5-slim
     command: ["cat"]
-    tty: true
-    
-    
+    tty: true  
   - name: docker
     image: docker:28
     command: ["cat"]
