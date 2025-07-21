@@ -1,34 +1,35 @@
 pipeline {
   agent {
-     kubernetes {
+        kubernetes {
             yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    app: jenkins-agent
-    version: v1
-spec:
-  - name: python
-    image: python:3.13.5-slim
-    command: ["cat"]
-    tty: true  
-  - name: docker
-    image: docker:28
-    command: ["cat"]
-    tty: true
-    volumeMounts:
-      - name: docker-sock
-        mountPath: /var/run/docker.sock
-  volumes:
-    - name: docker-sock
-      hostPath:
-        path: /var/run/docker.sock
-        type: Socket
-"""
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+                - name: jnlp
+                  image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-6
+
+                - name: python
+                  image: python:3.13
+                  command: ["cat"]
+                  tty: true
+
+                - name: docker
+                  image: docker:28
+                  command: ["cat"]
+                  tty: true
+                  volumeMounts:
+                    - name: docker-sock
+                      mountPath: /var/run/docker.sock
+              volumes:
+                - name: docker-sock
+                  hostPath:
+                    path: /var/run/docker.sock
+                    type: Socket
+            """
         }
-  }
- 
+    }
+
   environment {
     IMAGE_TAG = 'latest'
     SONAR_PROJECT_KEY = ""
