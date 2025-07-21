@@ -84,29 +84,8 @@ spec:
               }
             }
         }
-}
-  post {
-    success {
-      script {
-        echo "Pipeline completed successfully!"
-        emailext(
-          subject: 'Jenkins Pipeline Success',
-            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) completed successfully.\n\nCheck results: ${env.BUILD_URL}",
-          to: 'kara.nemesis@gmail.com' 
-        )
-      }
-    }
-    failure {
-      script {
-        echo "Pipeline failed!"
-        emailext(
-          subject: 'Jenkins Pipeline Failure',
-            body: "Pipeline '${env.JOB_NAME}' (#${env.BUILD_NUMBER}) failed.\n\nCheck the details here: ${env.BUILD_URL}",
-          to: 'kara.nemesis@gmail.com' 
-        )
-      }
-    }}
-}
+
+
     
      stage('Build image') { 
        steps { 
