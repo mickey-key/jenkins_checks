@@ -9,9 +9,7 @@ metadata:
     app: jenkins-agent
     version: v1
 spec:
-  containers:
-  - name: jnlp
-    image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-6
+ 
     
   - name: python
     image: python:3.13.5-slim
